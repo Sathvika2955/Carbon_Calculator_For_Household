@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Carbon Calculator Prototype with Chart</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 400px;
+    margin: 30px auto;
+    background: #f4f7f8;
+    padding: 20px;
+    border-radius: 8px;
+  }
+  h2 {
+    text-align: center;
+    color: #2c3e50;
+  }
+  label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+  }
+  input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    background-color: #27ae60;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #219150;
+  }
+  .result {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  canvas {
+    margin-top: 15px;
+  }
+</style>
+</head>
+<body>
+
+<h2>Carbon Calculator</h2>
+
+<label for="electricity">Electricity Usage (kWh):</label>
+<input type="number" id="electricity" placeholder="Enter kWh" />
+
+<label for="gas">Gas Usage (therms):</label>
+<input type="number" id="gas" placeholder="Enter therms" />
+
+<label for="transport">Transport Distance (km):</label>
+<input type="number" id="transport" placeholder="Enter km traveled" />
+
+<label for="waste">Waste Produced (kg):</label>
+<input type="number" id="waste" placeholder="Enter kg of waste" />
+
+<button onclick="calculateCarbon()">Calculate My Carbon Footprint</button>
+
+<button onclick="resetForm()">Reset</button>
+
+
+<div class="result" id="result" style="display:none;">
+  <strong>Your Estimated Monthly CO₂ Emissions:</strong>
+  <p id="co2value"></p>
+  <canvas id="co2Chart" width="300" height="300"></canvas>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  let chart; 
+
+  function calculateCarbon() {
+    const electricity = parseFloat(document.getElementById('electricity').value) || 0;
+    const gas = parseFloat(document.getElementById('gas').value) || 0;
+    const transport = parseFloat(document.getElementById('transport').value) || 0;
+    const waste = parseFloat(document.getElementById('waste').value) || 0;
+
+    const electricityCO2 = electricity * 0.7;
+    const gasCO2 = gas * 5;
+    const transportCO2 = transport * 0.21;
+    const wasteCO2 = waste * 0.1;
+
+    const totalCO2 = electricityCO2 + gasCO2 + transportCO2 + wasteCO2;
+
+    document.getElementById('co2value').innerText = totalCO2.toFixed(2) + ' kg CO₂';
+    document.getElementById('result').style.display = 'block';
+if(chart) {
+      chart.destroy();
+    }
+
+    const ctx = document.getElementById('co2Chart').getContext('2d');
+    chart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['Electricity', 'Gas', 'Transport', 'Waste'],
+        datasets: [{
+          label: 'CO₂ Emissions Breakdown',
+          data: [electricityCO2, gasCO2, transportCO2, wasteCO2],
+          backgroundColor: [
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(255, 206, 86, 0.7)',
+            'rgba(75, 192, 192, 0.7)'
+          ],
+          borderColor: [
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 99, 132, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+  }
+</script>
+<script>
+  function resetForm() {
+    document.getElementById('electricity').value = '';
+    document.getElementById('gas').value = '';
+    document.getElementById('transport').value = '';
+    document.getElementById('waste').value = '';
+    document.getElementById('result').style.display = 'none';
+    if (chart) chart.destroy();  
+  }
+</script>
+</body>
+</html>
